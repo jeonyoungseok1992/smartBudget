@@ -6,7 +6,7 @@ export default function BudgetForm({ selectedBudget, onSave }) {
     category: '',
     amount: '',
     month: '',
-    description: ''
+    budgetDescription: ''
   });
 
   // 카테고리 코드 목록 (DB에서 불러오게 바꿔도 됨)
@@ -22,7 +22,7 @@ export default function BudgetForm({ selectedBudget, onSave }) {
     if (selectedBudget) {
       setForm(selectedBudget);
     } else {
-      setForm({ category: '', amount: '', month: '', description: '' });
+      setForm({ category: '', amount: '', month: '', budgetDescription: '' });
     }
   }, [selectedBudget]);
 
@@ -40,7 +40,7 @@ export default function BudgetForm({ selectedBudget, onSave }) {
         await createBudget(form);
       }
       onSave();
-      setForm({ category: '', amount: '', month: '', description: '' });
+      setForm({ category: '', amount: '', month: '', budgetDescription: '' });
     } catch (error) {
       console.error('저장 실패', error);
     }
@@ -81,9 +81,9 @@ export default function BudgetForm({ selectedBudget, onSave }) {
           required
         />
         <input
-          name="description"
+          name="budgetDescription"
           placeholder="설명"
-          value={form.description}
+          value={form.budgetDescription}
           onChange={handleChange}
         />
         <button type="submit">{form.id ? '수정' : '등록'}</button>

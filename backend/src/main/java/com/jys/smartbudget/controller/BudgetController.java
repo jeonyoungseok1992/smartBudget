@@ -45,7 +45,7 @@ public class BudgetController {
         return budgetService.selectBudgetsByConditionWithPaging(condition);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     public String updateBudget(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody BudgetDTO budget) {

@@ -45,7 +45,7 @@ export default function BudgetList({ onEdit }) {
               <td>{b.category}</td>
               <td>{b.amount}</td>
               <td>{b.month}</td>
-              <td>{b.description}</td>
+              <td>{b.budgetDescription}</td>
               <td>
                 <button onClick={() => onEdit(b)}>수정</button>
                 <button onClick={() => handleDelete(b.id)}>삭제</button>

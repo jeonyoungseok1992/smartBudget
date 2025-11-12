@@ -16,7 +16,9 @@ public class BudgetDTO extends PageRequestDTO {
     private String category;  // 카테고리 (식비, 교통비 등)
     private Integer amount;   // 금액
     private String month;     // YYYY-MM 형식
-    private String description; // 상세설명
+    private String budgetDescription; // 상세설명
     private String userId;          // 유저아이디
+    private String categoryDescription; // 카테고리 설명
+    
 
 }
