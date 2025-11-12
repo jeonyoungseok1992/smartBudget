@@ -3,15 +3,14 @@ import React, { useState } from "react";
 import { login } from "../api/authApi";
 import api from "../api/api";
 
-function Login({ onLoginSuccess }) {setError
+function Login({ onLoginSuccess }) {
   const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");wfewqfewfqfw
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault();ssawfeawf
+    e.preventDefault();
     setError("");
-console.log();
 
     try {
       const response = await login(userId, password);
