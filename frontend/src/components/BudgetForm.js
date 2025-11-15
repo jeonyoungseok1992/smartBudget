@@ -47,7 +47,7 @@ export default function BudgetForm({ selectedBudget, onSave }) {
   };
 
   return (
-    <div>ss
+    <div>
       <h2>{form.id ? '예산 수정' : '예산 등록'}</h2>
       <form onSubmit={handleSubmit}>
         {/* ✅ 셀렉트 박스로 변경 */}

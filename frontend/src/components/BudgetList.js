@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getBudgets, deleteBudget } from '../api/budgetApi';
 
-export default function BudgetList({ onEdit }) {
+export default function BudgetList({ onEdit, onReload }) {
   const [budgets, setBudgets] = useState([]);
 
   const fetchBudgets = async () => {
@@ -22,9 +22,15 @@ export default function BudgetList({ onEdit }) {
     }
   };
 
+  // 초기 마운트 시 fetch
   useEffect(() => {
     fetchBudgets();
   }, []);
+
+  // onReload가 바뀔 때마다 fetch
+  useEffect(() => {
+    if (onReload) fetchBudgets();
+  }, [onReload]);
 
   return (
     <div>
@@ -42,7 +48,7 @@ export default function BudgetList({ onEdit }) {
         <tbody>
           {budgets.map((b) => (
             <tr key={b.id}>
-              <td>{b.category}</td>
+              <td>{b.categoryDescription}</td>
               <td>{b.amount}</td>
               <td>{b.month}</td>
               <td>{b.budgetDescription}</td>
