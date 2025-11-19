@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { createBudget, updateBudget } from '../api/budgetApi';
+import React, { useState, useEffect } from "react";
+import { createBudget, updateBudget } from "../api/budgetApi";
 
-export default function BudgetForm({ selectedBudget, onSave, year, month}) {
+export default function BudgetForm({ selectedBudget, onSave, year, month, budgets }) {
   const [form, setForm] = useState({
-    category: '',
-    amount: '',
-    month: '',
-    budgetDescription: ''
+    category: "",
+    amount: "",
+    budgetDescription: "",
   });
 
-  // 카테고리 코드 목록 (DB에서 불러오게 바꿔도 됨)
+  // 카테고리 코드 목록
   const categories = [
-    { code: 'FOOD', name: '식비' },
-    { code: 'TRANSPORT', name: '교통비' },
-    { code: 'HOUSING', name: '주거비' },
-    { code: 'ENTERTAIN', name: '여가/취미' },
-    { code: 'OTHER', name: '기타' }
+    { category: "FOOD", name: "식비" },
+    { category: "TRANSPORT", name: "교통비" },
+    { category: "HOUSING", name: "주거비" },
+    { category: "ENTERTAIN", name: "여가/취미" },
+    { category: "OTHER", name: "기타" },
   ];
 
+  // 선택된 예산이 바뀌면 폼 초기화
   useEffect(() => {
     if (selectedBudget) {
       setForm(selectedBudget);
     } else {
-      setForm({ category: '', amount: '', month: '', budgetDescription: '' });
+      setForm({ category: "", amount: "", budgetDescription: "" });
     }
   }, [selectedBudget]);
 
@@ -33,12 +33,7 @@ export default function BudgetForm({ selectedBudget, onSave, year, month}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      ...form,
-      year,
-      month
-    };
-
+    const payload = { ...form, year, month };
     try {
       if (form.id) {
         await updateBudget(payload);
@@ -46,26 +41,28 @@ export default function BudgetForm({ selectedBudget, onSave, year, month}) {
         await createBudget(payload);
       }
       onSave();
-      setForm({ category: '', amount: '', month: '', budgetDescription: '' });
+      setForm({ category: "", amount: "", budgetDescription: "" });
     } catch (error) {
-      console.error('저장 실패', error);
+      console.error("저장 실패", error);
     }
   };
 
+  // 현재 화면 년/월에 이미 등록된 카테고리 제외
+  const availableCategories = categories.filter((c) => {
+    return !budgets.some(
+      (b) => b.category === c.category && b.id !== form.id
+    );
+  });
+
+
   return (
     <div>
-      <h2>{form.id ? '예산 수정' : '예산 등록'}</h2>
+      <h2>{form.id ? "예산 수정" : "예산 등록"}</h2>
       <form onSubmit={handleSubmit}>
-        {/* ✅ 셀렉트 박스로 변경 */}
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          required
-        >
+        <select name="category" value={form.category} onChange={handleChange} required>
           <option value="">카테고리 선택</option>
-          {categories.map((c) => (
-            <option key={c.code} value={c.code}>
+          {availableCategories.map((c) => (
+            <option key={c.category} value={c.category}>
               {c.name}
             </option>
           ))}
@@ -85,7 +82,7 @@ export default function BudgetForm({ selectedBudget, onSave, year, month}) {
           value={form.budgetDescription}
           onChange={handleChange}
         />
-        <button type="submit">{form.id ? '수정' : '등록'}</button>
+        <button type="submit">{form.id ? "수정" : "등록"}</button>
       </form>
     </div>
   );

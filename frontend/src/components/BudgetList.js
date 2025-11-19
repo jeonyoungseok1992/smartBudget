@@ -1,36 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { getBudgets, deleteBudget } from '../api/budgetApi';
-
-export default function BudgetList({ onEdit, onReload, year, month }) {
-  const [budgets, setBudgets] = useState([]);
-
-  const fetchBudgets = async () => {
-    try {
-      const response = await getBudgets(year, month);
-      setBudgets(response.data);
-    } catch (error) {
-      console.error('예산 조회 실패', error);
-    }
-  };
-
+export default function BudgetList({ budgets, onEdit, onReload, onDelete }) {
   const handleDelete = async (id) => {
     try {
       await deleteBudget(id);
-      fetchBudgets(); // 삭제 후 다시 목록 갱신
+      onReload(); // 부모(App.js) 상태 갱신
     } catch (error) {
-      console.error('삭제 실패', error);
+      console.error("삭제 실패", error);
     }
   };
-
-  // 초기 마운트 시 fetch
-  useEffect(() => {
-    fetchBudgets();
-  }, [year, month]);
-
-  // onReload가 바뀔 때마다 fetch
-  useEffect(() => {
-    if (onReload) fetchBudgets();
-  }, [onReload]);
 
   return (
     <div>
@@ -52,7 +28,7 @@ export default function BudgetList({ onEdit, onReload, year, month }) {
               <td>{b.budgetDescription}</td>
               <td>
                 <button onClick={() => onEdit(b)}>수정</button>
-                <button onClick={() => handleDelete(b.id)}>삭제</button>
+                <button onClick={() => onDelete(b.id)}>삭제</button>
               </td>
             </tr>
           ))}

@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from "react";
 import BudgetList from "./components/BudgetList";
 import BudgetForm from "./components/BudgetForm";
-import ExpenseForm from "./components/ExpenseForm";
-import ExpenseList from "./components/ExpenseList";
-import BudgetPieChart from "./components/BudgetPieChart";
 import Login from "./components/Login";
-import { getBudgets } from "./api/budgetApi";
-import { getExpenses } from "./api/expenseApi";
+import { getBudgets, deleteBudget } from "./api/budgetApi";
 
 function App() {
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [reload, setReload] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [budgets, setBudgets] = useState([]);
-  const [expenses, setExpenses] = useState([]);
 
-  // ✔ 추가된 yearMonth 상태
+  // 상단 년/월 페이징 상태
   const [yearMonth, setYearMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -23,46 +18,43 @@ function App() {
 
   const [year, month] = yearMonth.split("-");
 
-
+  // 로그인 체크
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) setIsLoggedIn(true);
   }, []);
 
-  // 기존 데이터 조회는 그대로 유지
+  // 예산 조회
   useEffect(() => {
-    async function fetchData() {
-      const budgetsRes = await getBudgets(year, month);
-      const expensesRes = await getExpenses();
-
-      setBudgets(budgetsRes.data);
-      setExpenses(expensesRes.data);
+    async function fetchBudgets() {
+      try {
+        const res = await getBudgets(year, month);
+        setBudgets(res.data);
+      } catch (error) {
+        console.error("예산 조회 실패", error);
+      }
     }
-    fetchData();
-  }, [reload]);
+    fetchBudgets();
+  }, [reload, year, month]);
 
   const handleSave = () => setReload(prev => !prev);
+
   const handleLoginSuccess = () => setIsLoggedIn(true);
   const handleLogout = () => {
     localStorage.removeItem("jwtToken");
     setIsLoggedIn(false);
   };
 
-  if (!isLoggedIn) return <Login onLoginSuccess={handleLoginSuccess} />;
+  const handleDelete = async (id) => {
+    try {
+      await deleteBudget(id);
+      setReload(prev => !prev); // 리스트 갱신
+    } catch (err) {
+      console.error("삭제 실패", err);
+    }
+  };
 
-  // PieChart용 데이터
-  const chartData = budgets.map(b => {
-    const totalExpense = expenses
-      .filter(e => e.budgetId === b.id)
-      .reduce((sum, e) => sum + e.amount, 0);
-    return {
-      category: b.category,
-      budget: b.amount,
-      expense: totalExpense,
-    };
-  });
-
-  // ✔ 년/월 이동 함수 추가
+  // 년/월 이동
   const moveMonth = (diff) => {
     const date = new Date(yearMonth + "-01");
     date.setMonth(date.getMonth() + diff);
@@ -70,27 +62,36 @@ function App() {
     setYearMonth(newYm);
   };
 
+  if (!isLoggedIn) return <Login onLoginSuccess={handleLoginSuccess} />;
+
   return (
     <div>
       <h1>SmartBudget</h1>
       <button onClick={handleLogout}>로그아웃</button>
 
-      {/* ✔ 상단 년/월 페이징 UI */}
+      {/* 상단 년/월 페이징 */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "20px 0" }}>
         <button onClick={() => moveMonth(-1)}>◀ 이전달</button>
         <strong>{yearMonth}</strong>
         <button onClick={() => moveMonth(1)}>다음달 ▶</button>
       </div>
 
-      {/* 기존 구조 그대로 */}
-      <BudgetForm selectedBudget={selectedBudget} onSave={handleSave} year={year} month={month}/>
-      <BudgetList onEdit={setSelectedBudget} onReload={handleSave} year={year} month={month}/>
+      {/* 예산 등록/수정 폼 */}
+      <BudgetForm
+        selectedBudget={selectedBudget}
+        onSave={handleSave}
+        budgets={budgets}
+        year={year}
+        month={month}
+      />
 
-      <ExpenseForm onSave={handleSave} />
-      <ExpenseList expenses={expenses} />
-
-      <h2>전체 예산/지출 현황</h2>
-      {chartData.length > 0 && <BudgetPieChart chartData={chartData} />}
+      {/* 예산 리스트 */}
+      <BudgetList
+        budgets={budgets}
+        onEdit={setSelectedBudget}
+        onReload={handleSave}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
