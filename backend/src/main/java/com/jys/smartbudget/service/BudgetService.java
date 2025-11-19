@@ -31,5 +31,9 @@ public class BudgetService {
         budgetMapper.deleteBudget(id, userId);
     }
 
+    public Boolean existsByYearMonthCategory(BudgetDTO budget) {
+        return budgetMapper.existsByYearMonthCategory(budget);
+    }
+
 
 }

@@ -3,6 +3,9 @@ package com.jys.smartbudget.controller;
 import com.jys.smartbudget.config.JwtUtil;
 import com.jys.smartbudget.dto.BudgetDTO;
 import com.jys.smartbudget.service.BudgetService;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +22,7 @@ public class BudgetController {
 
     // 예산 등록 (JWT에서 userId 추출)
     @PostMapping
-    public String insertBudget(
+    public ResponseEntity<String> insertBudget(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody BudgetDTO budget) {
 
@@ -27,8 +30,16 @@ public class BudgetController {
         String userId = JwtUtil.extractUserId(token);
         budget.setUserId(userId);
 
+        boolean exists = budgetService.existsByYearMonthCategory(budget);
+    
+        if (exists) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("해당 년월에 이미 등록된 카테고리입니다.");
+        }
+
         budgetService.insertBudget(budget);
-        return "예산이 등록되었습니다.";
+        return ResponseEntity.ok("예산이 등록되었습니다.");
     }
 
     // 검색 (필요시 userId 포함)
