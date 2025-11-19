@@ -14,7 +14,8 @@ public class ExpenseDTO {
 
     private Integer amount;   // 지출 금액
     private String description;      // 메모
-    private String date;      // 날짜 (yyyy-MM-dd)
-
+    private Integer year;
+    private Integer month;
+    private Integer day;
     private String userId;    // 유저
 }

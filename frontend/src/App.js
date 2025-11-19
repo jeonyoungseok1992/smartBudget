@@ -15,15 +15,24 @@ function App() {
   const [budgets, setBudgets] = useState([]);
   const [expenses, setExpenses] = useState([]);
 
+  // ✔ 추가된 yearMonth 상태
+  const [yearMonth, setYearMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  });
+
+  const [year, month] = yearMonth.split("-");
+
+
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) setIsLoggedIn(true);
   }, []);
 
-  // 모든 예산/지출 조회
+  // 기존 데이터 조회는 그대로 유지
   useEffect(() => {
     async function fetchData() {
-      const budgetsRes = await getBudgets();
+      const budgetsRes = await getBudgets(year, month);
       const expensesRes = await getExpenses();
 
       setBudgets(budgetsRes.data);
@@ -53,13 +62,29 @@ function App() {
     };
   });
 
+  // ✔ 년/월 이동 함수 추가
+  const moveMonth = (diff) => {
+    const date = new Date(yearMonth + "-01");
+    date.setMonth(date.getMonth() + diff);
+    const newYm = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    setYearMonth(newYm);
+  };
+
   return (
     <div>
       <h1>SmartBudget</h1>
       <button onClick={handleLogout}>로그아웃</button>
 
-      <BudgetForm selectedBudget={selectedBudget} onSave={handleSave} />
-      <BudgetList onEdit={setSelectedBudget} onReload={handleSave} />
+      {/* ✔ 상단 년/월 페이징 UI */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "20px 0" }}>
+        <button onClick={() => moveMonth(-1)}>◀ 이전달</button>
+        <strong>{yearMonth}</strong>
+        <button onClick={() => moveMonth(1)}>다음달 ▶</button>
+      </div>
+
+      {/* 기존 구조 그대로 */}
+      <BudgetForm selectedBudget={selectedBudget} onSave={handleSave} year={year} month={month}/>
+      <BudgetList onEdit={setSelectedBudget} onReload={handleSave} year={year} month={month}/>
 
       <ExpenseForm onSave={handleSave} />
       <ExpenseList expenses={expenses} />

@@ -2,7 +2,6 @@ package com.jys.smartbudget.controller;
 
 import com.jys.smartbudget.config.JwtUtil;
 import com.jys.smartbudget.dto.BudgetDTO;
-import com.jys.smartbudget.dto.BudgetUsageDTO;
 import com.jys.smartbudget.service.BudgetService;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,13 +35,17 @@ public class BudgetController {
     @GetMapping("/search")
     public List<BudgetDTO> searchBudgets(
             @RequestHeader("Authorization") String authHeader,
-            BudgetDTO condition) {
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
 
+        BudgetDTO budget = new BudgetDTO();
         String token = authHeader.replace("Bearer ", "");
         String userId = JwtUtil.extractUserId(token);
-        condition.setUserId(userId);
+        budget.setUserId(userId);
+        budget.setYear(year);
+        budget.setMonth(month);
 
-        return budgetService.selectBudgetsByConditionWithPaging(condition);
+        return budgetService.selectBudgetsByConditionWithPaging(budget);
     }
 
     @PutMapping
@@ -68,12 +71,5 @@ public class BudgetController {
 
         budgetService.deleteBudget(id, userId);
         return "예산이 삭제되었습니다.";
-    }
-
-    @GetMapping("/usage")
-    public List<BudgetUsageDTO> getBudgetUsage(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtil.extractUserId(token);
-        return budgetService.getBudgetUsage(userId);
     }
 }

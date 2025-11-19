@@ -58,26 +58,4 @@ public class ExpenseController {
         return "지출이 삭제되었습니다.";
     }
 
-    // 예산별 지출 조회 (PieChart 용)
-    @GetMapping("/budget/{budgetId}")
-    public List<ExpenseDTO> getExpensesByBudget(
-            @RequestHeader("Authorization") String authHeader,
-            @PathVariable Long budgetId) {
-
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtil.extractUserId(token);
-
-        return expenseService.getExpensesByBudgetId(budgetId, userId);
-    }
-
-    // 전체 사용자 지출 조회 (PieChart 전체)
-    @GetMapping("/all")
-    public List<ExpenseDTO> getAllExpenses(
-            @RequestHeader("Authorization") String authHeader) {
-
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtil.extractUserId(token);
-
-        return expenseService.getAllExpensesByUser(userId);
-    }
 }

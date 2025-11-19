@@ -7,15 +7,18 @@
 
     <!-- 지출 등록 -->
     <insert id="insertExpense" parameterType="com.jys.smartbudget.dto.ExpenseDTO">
-        INSERT INTO expense (budget_id, amount, description, user_id)
-        VALUES (#{budgetId}, #{amount}, #{description}, #{userId})
+        INSERT INTO expense (budget_id, amount, description, user_id, year, month, day)
+        VALUES (#{budgetId}, #{amount},, #{year}, #{month}, #{day} #{description}, #{userId})
     </insert>
 
     <!-- 지출 수정 -->
     <update id="updateExpense" parameterType="com.jys.smartbudget.dto.ExpenseDTO">
         UPDATE expense
         SET amount = #{amount},
-            description = #{description}
+            description = #{description},
+            year = #{year},
+            month = #{month},
+            day = #{day},
         WHERE id = #{id} AND user_id = #{userId}
     </update>
 
@@ -24,37 +27,5 @@
         DELETE FROM expense
         WHERE id = #{id} AND user_id = #{userId}
     </delete>
-
-    <!-- 특정 예산에 대한 지출 조회 (budget 테이블 JOIN해서 category 가져오기) -->
-    <select id="selectByBudgetIdAndUserId" resultType="com.jys.smartbudget.dto.ExpenseDTO">
-        SELECT e.id,
-               e.budget_id AS budgetId,
-               b.category AS category,
-               e.amount,
-               e.description,
-               e.created_at AS createdAt,
-               e.updated_at AS updatedAt,
-               e.user_id AS userId
-        FROM expense e
-        JOIN budget b ON e.budget_id = b.id
-        WHERE e.budget_id = #{budgetId} AND e.user_id = #{userId}
-        ORDER BY e.created_at DESC
-    </select>
-
-    <!-- 전체 사용자 지출 조회 (budget 테이블 JOIN해서 category 가져오기) -->
-    <select id="selectAllByUserId" resultType="com.jys.smartbudget.dto.ExpenseDTO">
-        SELECT e.id,
-               e.budget_id AS budgetId,
-               b.category AS category,
-               e.amount,
-               e.description,
-               e.created_at AS createdAt,
-               e.updated_at AS updatedAt,
-               e.user_id AS userId
-        FROM expense e
-        JOIN budget b ON e.budget_id = b.id
-        WHERE e.user_id = #{userId}
-        ORDER BY e.created_at DESC
-    </select>
 
 </mapper>

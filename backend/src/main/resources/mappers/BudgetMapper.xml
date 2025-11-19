@@ -6,8 +6,8 @@
 <mapper namespace="com.jys.smartbudget.mapper.BudgetMapper">
 
     <insert id="insertBudget">
-        INSERT INTO budget (user_id, category, amount, month, description)
-        VALUES (#{userId}, #{category}, #{amount}, #{month}, #{budgetDescription})
+        INSERT INTO budget (user_id, category, amount, year, month, description)
+        VALUES (#{userId}, #{category}, #{amount}, #{year}, #{month}, #{budgetDescription})
     </insert>
 
     <select id="selectBudgetsByConditionWithPaging" resultType="com.jys.smartbudget.dto.BudgetDTO">
@@ -25,17 +25,20 @@
         <if test="category != null and category != ''">
             AND b.category = #{category}
         </if>
-        <if test="month != null and month != ''">
-            AND b.month = #{month}
+        <if test="year != null">
+            AND year = #{year}
+        </if>
+        <if test="month != null">
+            AND month = #{month}
         </if>
         ORDER BY b.month DESC
     </select>
-
 
     <update id="updateBudget">
         UPDATE budget
         SET category = #{category},
             amount = #{amount},
+            year = #{year},
             month = #{month},
             description = #{budgetDescription}
         WHERE id = #{id}
@@ -47,12 +50,5 @@
         WHERE id = #{id}
           AND user_id = #{userId}
     </delete>
-
-    <select id="getBudgetUsage" resultType="com.jys.smartbudget.dto.BudgetUsageDTO">
-        SELECT category, SUM(amount) AS usedAmount
-        FROM budget
-        WHERE user_id = #{userId}
-        GROUP BY category
-    </select>
 
 </mapper>

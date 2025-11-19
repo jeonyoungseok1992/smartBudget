@@ -27,11 +27,4 @@ public class ExpenseService {
         expenseMapper.deleteExpenseByIdAndUserId(id, userId);
     }
 
-    public List<ExpenseDTO> getExpensesByBudgetId(Long budgetId, String userId) {
-        return expenseMapper.selectByBudgetIdAndUserId(budgetId, userId);
-    }
-
-    public List<ExpenseDTO> getAllExpensesByUser(String userId) {
-        return expenseMapper.selectAllByUserId(userId);
-    }
 }

@@ -14,7 +14,4 @@ public interface ExpenseMapper {
 
     void deleteExpenseByIdAndUserId(Long id, String userId);
 
-    List<ExpenseDTO> selectByBudgetIdAndUserId(Long budgetId, String userId);
-
-    List<ExpenseDTO> selectAllByUserId(String userId);
 }

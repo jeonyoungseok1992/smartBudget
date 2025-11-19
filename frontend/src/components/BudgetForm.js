@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createBudget, updateBudget } from '../api/budgetApi';
 
-export default function BudgetForm({ selectedBudget, onSave }) {
+export default function BudgetForm({ selectedBudget, onSave, year, month}) {
   const [form, setForm] = useState({
     category: '',
     amount: '',
@@ -33,11 +33,17 @@ export default function BudgetForm({ selectedBudget, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      ...form,
+      year,
+      month
+    };
+
     try {
       if (form.id) {
-        await updateBudget(form);
+        await updateBudget(payload);
       } else {
-        await createBudget(form);
+        await createBudget(payload);
       }
       onSave();
       setForm({ category: '', amount: '', month: '', budgetDescription: '' });
@@ -70,13 +76,6 @@ export default function BudgetForm({ selectedBudget, onSave }) {
           type="number"
           placeholder="금액"
           value={form.amount}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="month"
-          placeholder="YYYY-MM"
-          value={form.month}
           onChange={handleChange}
           required
         />

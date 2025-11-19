@@ -1,7 +1,6 @@
 package com.jys.smartbudget.service;
 
 import com.jys.smartbudget.dto.BudgetDTO;
-import com.jys.smartbudget.dto.BudgetUsageDTO;
 import com.jys.smartbudget.mapper.BudgetMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,5 @@ public class BudgetService {
         budgetMapper.deleteBudget(id, userId);
     }
 
-    public List<BudgetUsageDTO> getBudgetUsage(String userId) {
-        return budgetMapper.getBudgetUsage(userId);
-    }
+
 }
