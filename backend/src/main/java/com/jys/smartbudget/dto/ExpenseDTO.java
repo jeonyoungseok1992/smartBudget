@@ -11,7 +11,7 @@ public class ExpenseDTO {
 
     private Long id;          // PK
     private Long budgetId;    // FK -> budget.id
-
+    private String category;      // 메모
     private Integer amount;   // 지출 금액
     private String description;      // 메모
     private Integer year;

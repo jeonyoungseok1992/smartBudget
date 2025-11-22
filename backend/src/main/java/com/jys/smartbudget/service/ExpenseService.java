@@ -15,6 +15,10 @@ public class ExpenseService {
         this.expenseMapper = expenseMapper;
     }
 
+    public List<ExpenseDTO> searchExpenses(ExpenseDTO expense) {
+        return expenseMapper.searchExpenses(expense);
+    }
+
     public void insertExpense(ExpenseDTO expense) {
         expenseMapper.insertExpense(expense);
     }
@@ -25,6 +29,10 @@ public class ExpenseService {
 
     public void deleteExpense(Long id, String userId) {
         expenseMapper.deleteExpenseByIdAndUserId(id, userId);
+    }
+
+    public Boolean checkOverBudget(ExpenseDTO expense) {
+        return expenseMapper.checkOverBudget(expense);
     }
 
 }

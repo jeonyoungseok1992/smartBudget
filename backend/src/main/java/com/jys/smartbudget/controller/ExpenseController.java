@@ -4,6 +4,9 @@ import com.jys.smartbudget.config.JwtUtil;
 import com.jys.smartbudget.dto.ExpenseDTO;
 import com.jys.smartbudget.service.ExpenseService;
 import org.springframework.web.bind.annotation.*;
+import com.jys.smartbudget.dto.ApiResponse;
+import org.springframework.http.ResponseEntity;
+
 
 import java.util.List;
 
@@ -17,9 +20,26 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
+        // 검색 (필요시 userId 포함)
+    @GetMapping("/search")
+    public List<ExpenseDTO> searchExpenses(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+
+        ExpenseDTO expense = new ExpenseDTO();
+        String token = authHeader.replace("Bearer ", "");
+        String userId = JwtUtil.extractUserId(token);
+        expense.setUserId(userId);
+        expense.setYear(year);
+        expense.setMonth(month);
+
+        return expenseService.searchExpenses(expense);
+    }
+
     // 지출 등록
     @PostMapping
-    public String insertExpense(
+    public ResponseEntity<ApiResponse> insertExpense(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody ExpenseDTO expense) {
 
@@ -28,7 +48,15 @@ public class ExpenseController {
         expense.setUserId(userId);
 
         expenseService.insertExpense(expense);
-        return "지출이 등록되었습니다.";
+
+        boolean overBudget = expenseService.checkOverBudget(expense);
+        if (overBudget) {
+            return ResponseEntity.ok(
+                new ApiResponse(true, "해당 예산을 초과했습니다.", null));
+        } else {
+            return ResponseEntity.ok(
+                new ApiResponse(true, "지출이 등록되었습니다", null));
+        }
     }
 
     // 지출 수정
