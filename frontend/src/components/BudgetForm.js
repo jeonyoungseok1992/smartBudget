@@ -1,6 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { createBudget, updateBudget } from "../api/budgetApi";
 
+const formStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+};
+
+const inputStyle = {
+  padding: "8px 12px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  fontSize: "14px",
+};
+
+const submitButtonStyle = {
+  padding: "10px 16px",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+  backgroundColor: "#4CAF50",
+  color: "#fff",
+  fontWeight: "bold",
+};
+
+const selectStyle = {
+  padding: "8px 12px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  fontSize: "14px",
+  backgroundColor: "#fff",
+  appearance: "none", // 기본 화살표 제거
+  cursor: "pointer",
+};
+
 export default function BudgetForm({ selectedBudget, onSave, year, month, budgets }) {
   const [form, setForm] = useState({
     category: "",
@@ -58,8 +91,8 @@ export default function BudgetForm({ selectedBudget, onSave, year, month, budget
   return (
     <div>
       <h2>{form.id ? "예산 수정" : "예산 등록"}</h2>
-      <form onSubmit={handleSubmit}>
-        <select name="category" value={form.category} onChange={handleChange} required>
+      <form onSubmit={handleSubmit} style={formStyle}>
+        <select name="category" value={form.category} onChange={handleChange} style={selectStyle} required>
           <option value="">카테고리 선택</option>
           {availableCategories.map((c) => (
             <option key={c.category} value={c.category}>
@@ -74,6 +107,7 @@ export default function BudgetForm({ selectedBudget, onSave, year, month, budget
           placeholder="금액"
           value={form.amount}
           onChange={handleChange}
+          style={inputStyle}
           required
         />
         <input
@@ -81,8 +115,9 @@ export default function BudgetForm({ selectedBudget, onSave, year, month, budget
           placeholder="설명"
           value={form.budgetDescription}
           onChange={handleChange}
+          style={inputStyle}
         />
-        <button type="submit">{form.id ? "수정" : "등록"}</button>
+        <button type="submit" style={submitButtonStyle}>{form.id ? "수정" : "등록"}</button>
       </form>
     </div>
   );

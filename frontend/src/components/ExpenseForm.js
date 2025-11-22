@@ -1,22 +1,61 @@
-import React, { useState } from 'react';
-import { createExpense } from '../api/expenseApi';
+import React, { useState, useEffect } from "react";
+import { createExpense, updateExpense } from "../api/expenseApi";
 
-// BudgetForm과 동일한 카테고리 코드 목록
-const categories = [
-  { code: 'FOOD', name: '식비' },
-  { code: 'TRANSPORT', name: '교통비' },
-  { code: 'HOUSING', name: '주거비' },
-  { code: 'ENTERTAIN', name: '여가/취미' },
-  { code: 'OTHER', name: '기타' }
-];
+const formStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+};
 
-export default function ExpenseForm({ onSave }) {
+const inputStyle = {
+  padding: "8px 12px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  fontSize: "14px",
+};
+
+const submitButtonStyle = {
+  padding: "10px 16px",
+  borderRadius: "6px",
+  border: "none",
+  cursor: "pointer",
+  backgroundColor: "#4CAF50",
+  color: "#fff",
+  fontWeight: "bold",
+};
+
+const selectStyle = {
+  padding: "8px 12px",
+  borderRadius: "6px",
+  border: "1px solid #ccc",
+  fontSize: "14px",
+  backgroundColor: "#fff",
+  appearance: "none", // 기본 화살표 제거
+  cursor: "pointer",
+};
+
+export default function ExpenseForm({ selectedExpense, budgets, year, month, onSave }) {
   const [form, setForm] = useState({
-    category: '',
-    amount: '',
-    description: '',
-    date: ''
+    budgetId: "",
+    day: "",
+    amount: "",
+    description: "",
   });
+
+  // selectedExpense가 바뀌면 폼 초기화
+  useEffect(() => {
+    if (selectedExpense) {
+      setForm({
+        budgetId: selectedExpense.budgetId || "",
+        day: selectedExpense.day || "",
+        amount: selectedExpense.amount || "",
+        description: selectedExpense.description || "",
+        id: selectedExpense.id || null,
+      });
+    } else {
+      setForm({ budgetId: "", day: "", amount: "", description: "" });
+    }
+  }, [selectedExpense]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,61 +64,69 @@ export default function ExpenseForm({ onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.category || !form.amount || !form.date) {
-      return alert('카테고리, 금액, 날짜는 필수입니다.');
-    }
+    const payload = { ...form, year, month };
 
     try {
-      await createExpense({
-        category: form.category,
-        amount: parseInt(form.amount),
-        description: form.description,
-        date: form.date
-      });
-      setForm({ category: '', amount: '', description: '', date: '' });
+      let response;
+      if (form.id) {
+        response = await updateExpense(payload);
+      } else {
+        response = await createExpense(payload);
+      }
+
+      // 서버에서 반환한 메시지 alert로 표시
+      if (response && response.data && response.data.message) {
+        alert(response.data.message);
+      }
       onSave();
+      setForm({ budgetId: "", day: "", amount: "", description: "" });
     } catch (err) {
-      console.error('지출 등록 실패', err);
+      console.error("지출 저장 실패", err);
     }
   };
 
   return (
     <div>
-      <h2>지출 등록</h2>
-      <form onSubmit={handleSubmit}>
-        {/* BudgetForm과 동일한 카테고리 셀렉트 */}
-        <select name="category" value={form.category} onChange={handleChange} required>
+      <h2>{form.id ? "지출 수정" : "지출 등록"}</h2>
+      <form onSubmit={handleSubmit} style={formStyle}>
+        <select name="budgetId" value={form.budgetId} onChange={handleChange} style={selectStyle} required>
           <option value="">카테고리 선택</option>
-          {categories.map(c => (
-            <option key={c.code} value={c.code}>
-              {c.name}
+          {budgets.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.categoryDescription}
             </option>
           ))}
         </select>
 
         <input
+          name="day"
           type="number"
+          placeholder="일자"
+          value={form.day}
+          onChange={handleChange}
+          style={inputStyle}
+          required
+        />
+
+        <input
           name="amount"
+          type="number"
           placeholder="금액"
           value={form.amount}
           onChange={handleChange}
+          style={inputStyle}
           required
         />
+
         <input
-          type="text"
           name="description"
           placeholder="설명"
           value={form.description}
+          style={inputStyle}
           onChange={handleChange}
         />
-        <input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">등록</button>
+
+        <button type="submit" style={submitButtonStyle}>{form.id ? "수정" : "등록"}</button>
       </form>
     </div>
   );

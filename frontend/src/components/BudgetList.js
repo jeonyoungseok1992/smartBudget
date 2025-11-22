@@ -1,34 +1,57 @@
 export default function BudgetList({ budgets, onEdit, onReload, onDelete }) {
-  const handleDelete = async (id) => {
-    try {
-      await deleteBudget(id);
-      onReload(); // 부모(App.js) 상태 갱신
-    } catch (error) {
-      console.error("삭제 실패", error);
-    }
+
+  const tableStyle = {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: "14px",
   };
+
+  const thStyle = {
+    backgroundColor: "#1976D2",
+    color: "#fff",
+    padding: "10px",
+    textAlign: "left",
+    borderBottom: "2px solid #ddd",
+  };
+
+  const tdStyle = {
+    padding: "10px",
+    borderBottom: "1px solid #eee",
+  };
+
+  const actionButtonStyle = {
+    padding: "6px 12px",
+    marginRight: "6px",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "12px",
+  };
+
+  const editButtonStyle = { ...actionButtonStyle, backgroundColor: "#FF9800", color: "#fff" };
+  const deleteButtonStyle = { ...actionButtonStyle, backgroundColor: "#f44336", color: "#fff" };
 
   return (
     <div>
       <h2>예산 목록</h2>
-      <table border="1" cellPadding="5">
+      <table style={tableStyle}>
         <thead>
           <tr>
-            <th>카테고리</th>
-            <th>금액</th>
-            <th>설명</th>
-            <th>액션</th>
+            <th style={thStyle}>카테고리</th>
+            <th style={thStyle}>금액</th>
+            <th style={thStyle}>설명</th>
+            <th style={{ ...thStyle, width: "120px" }}></th>
           </tr>
         </thead>
         <tbody>
           {budgets.map((b) => (
             <tr key={b.id}>
-              <td>{b.categoryDescription}</td>
-              <td>{b.amount}</td>
-              <td>{b.budgetDescription}</td>
-              <td>
-                <button onClick={() => onEdit(b)}>수정</button>
-                <button onClick={() => onDelete(b.id)}>삭제</button>
+              <td style={tdStyle}>{b.categoryDescription}</td>
+              <td style={tdStyle}>{b.amount}원</td>
+              <td style={tdStyle}>{b.budgetDescription}</td>
+              <td style={tdStyle}>
+                <button style={editButtonStyle} onClick={() => onEdit(b)}>수정</button>
+                <button style={deleteButtonStyle} onClick={() => onDelete(b.id)}>삭제</button>
               </td>
             </tr>
           ))}
