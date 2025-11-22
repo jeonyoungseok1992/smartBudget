@@ -37,27 +37,36 @@ public class ExpenseController {
         return expenseService.searchExpenses(expense);
     }
 
-    // 지출 등록
     @PostMapping
     public ResponseEntity<ApiResponse> insertExpense(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody ExpenseDTO expense) {
 
-        String token = authHeader.replace("Bearer ", "");
-        String userId = JwtUtil.extractUserId(token);
-        expense.setUserId(userId);
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String userId = JwtUtil.extractUserId(token);
+            expense.setUserId(userId);
 
-        expenseService.insertExpense(expense);
+            // DB insert 시도
+            expenseService.insertExpense(expense);
 
-        boolean overBudget = expenseService.checkOverBudget(expense);
-        if (overBudget) {
+            // 예산 초과 체크
+            boolean overBudget = expenseService.checkOverBudget(expense);
+            if (overBudget) {
+                return ResponseEntity.ok(
+                    new ApiResponse(true, "해당 예산을 초과했습니다.", null));
+            } else {
+                return ResponseEntity.ok(
+                    new ApiResponse(true, "지출이 등록되었습니다", null));
+            }
+
+        } catch (Exception e) {
+            // insert 실패 혹은 다른 예외 발생 시
             return ResponseEntity.ok(
-                new ApiResponse(true, "해당 예산을 초과했습니다.", null));
-        } else {
-            return ResponseEntity.ok(
-                new ApiResponse(true, "지출이 등록되었습니다", null));
+                new ApiResponse(false, "지출 등록 중 오류가 발생했습니다: " + e.getMessage(), null));
         }
     }
+
 
     // 지출 수정
     @PutMapping
