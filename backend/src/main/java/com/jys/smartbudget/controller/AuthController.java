@@ -1,3 +1,17 @@
+package com.jys.smartbudget.controller;
+
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
+import com.jys.smartbudget.dto.ApiResponse;
+import com.jys.smartbudget.dto.UserDTO;
+import com.jys.smartbudget.service.UserService;
+import com.jys.smartbudget.config.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -21,6 +35,11 @@ public class AuthController {
         try {
             userService.register(user);
             return ResponseEntity.ok(new ApiResponse(true, "회원가입 성공", null));
+
+        } catch (DuplicateKeyException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponse(false, "이미 존재하는 아이디입니다.", null));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(false, "회원가입 실패: " + e.getMessage(), null));

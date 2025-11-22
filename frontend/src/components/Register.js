@@ -19,8 +19,11 @@ function Register({ onRegisterSuccess, onBackToLogin }) {
       alert("회원가입이 완료되었습니다!");
       onRegisterSuccess();
     } catch (err) {
-      if (err.response?.data?.message) setError(err.response.data.message);
-      else setError("회원가입 중 오류가 발생했습니다.");
+      if (err.response && err.response.status === 409) {
+        setError("이미 존재하는 아이디입니다.");
+      } else {
+        setError("회원가입 중 오류가 발생했습니다.");
+      }
     }
   };
 
